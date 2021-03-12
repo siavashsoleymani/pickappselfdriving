@@ -5,7 +5,6 @@
 
 package service.impl;
 
-import java.io.IOException;
 import service.SpeedControlService;
 
 public class SpeedControlServiceImpl implements SpeedControlService {
@@ -14,7 +13,7 @@ public class SpeedControlServiceImpl implements SpeedControlService {
   private static final int NEUTRAL_SPEED = 1500;
   private static final int SPEED_STEP = 20;
   private static final int HIGH_SPEED_STEP = 20;
-  private static int CURRENT_SPEED = 1500;
+  public static int CURRENT_SPEED = 1500;
 
   public SpeedControlServiceImpl() {
   }
@@ -25,49 +24,60 @@ public class SpeedControlServiceImpl implements SpeedControlService {
       builder.command("sh", "-c", "pigs s 4 " + speed);
       Process process = builder.start();
       process.waitFor();
-    } catch (IOException var3) {
-      var3.printStackTrace();
-    } catch (InterruptedException var4) {
-      var4.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
   }
 
+  @Override
   public int changeSpeed(String s) {
     if (s.equalsIgnoreCase("w")) {
-      if (CURRENT_SPEED + 20 > 2000) {
-        CURRENT_SPEED = 2000;
+      if (CURRENT_SPEED + SPEED_STEP > MAX_SPEED) {
+        CURRENT_SPEED = MAX_SPEED;
       } else {
-        CURRENT_SPEED += 20;
+        CURRENT_SPEED += SPEED_STEP;
       }
     } else if (s.equalsIgnoreCase("s")) {
-      if (CURRENT_SPEED - 20 < 700) {
-        CURRENT_SPEED = 700;
+      if (CURRENT_SPEED - SPEED_STEP < MIN_SPEED) {
+        CURRENT_SPEED = MIN_SPEED;
       } else {
-        CURRENT_SPEED -= 20;
+        CURRENT_SPEED -= SPEED_STEP;
       }
     } else if (s.equalsIgnoreCase("q")) {
-      if (CURRENT_SPEED + 20 > 2000) {
-        CURRENT_SPEED = 2000;
+      if (CURRENT_SPEED + HIGH_SPEED_STEP > MAX_SPEED) {
+        CURRENT_SPEED = MAX_SPEED;
       } else {
-        CURRENT_SPEED += 20;
+        CURRENT_SPEED += HIGH_SPEED_STEP;
       }
     } else if (s.equalsIgnoreCase("e")) {
-      if (CURRENT_SPEED - 20 < 700) {
-        CURRENT_SPEED = 700;
+      if (CURRENT_SPEED - HIGH_SPEED_STEP < MIN_SPEED) {
+        CURRENT_SPEED = MIN_SPEED;
       } else {
-        CURRENT_SPEED -= 20;
+        CURRENT_SPEED -= HIGH_SPEED_STEP;
       }
     } else {
       if (!s.equalsIgnoreCase(" ")) {
         throw new IllegalArgumentException("It must be one of the s,w,q,e or space commands");
       }
 
-      CURRENT_SPEED = 1500;
+      CURRENT_SPEED = NEUTRAL_SPEED;
     }
 
     System.out.println(CURRENT_SPEED);
     setSpeed(CURRENT_SPEED);
     return CURRENT_SPEED;
   }
+
+  @Override
+  public void emergencyBreak() {
+    System.out.println("Thread in emergency break: " + Thread.currentThread().getId());
+    changeSpeed(" ");
+    try {
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+  }
+
 }
