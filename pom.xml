@@ -25,19 +25,19 @@
         <dependency>
             <groupId>com.pi4j</groupId>
             <artifactId>pi4j-core</artifactId>
-            <version>1.2</version>
+            <version>1.4</version>
         </dependency>
         <dependency>
             <groupId>com.pi4j</groupId>
             <artifactId>pi4j-parent</artifactId>
-            <version>1.2</version>
+            <version>1.4</version>
             <type>pom</type>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.pi4j/pi4j-gpio-extension -->
         <dependency>
             <groupId>com.pi4j</groupId>
             <artifactId>pi4j-gpio-extension</artifactId>
-            <version>1.2</version>
+            <version>1.3</version>
         </dependency>
 
     </dependencies>
