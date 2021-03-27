@@ -26,7 +26,7 @@ public class Main {
 
     SpeedControlService speedControlService = new SpeedControlServiceImpl();
     SteeringControlService steeringControlService = new SteeringControlServiceImpl();
-    CommandSubscriber commandSubscriber = TCPCommandSubscriberImpl.getInstance("snapptix.ir", 8081,
+    CommandSubscriber commandSubscriber = TCPCommandSubscriberImpl.getInstance("snapptix.ir", 8080,
         new CommandSenderImpl(speedControlService, steeringControlService), executorService);
     DistanceMeasureService distanceMeasureService = new DistanceMeasureServiceImpl();
 
