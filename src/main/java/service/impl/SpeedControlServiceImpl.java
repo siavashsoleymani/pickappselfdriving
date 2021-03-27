@@ -8,7 +8,7 @@ package service.impl;
 import service.SpeedControlService;
 
 public class SpeedControlServiceImpl implements SpeedControlService {
-  private static ElectronicSpeedControllerImpl electronicSpeedController =
+  private static final ElectronicSpeedControllerImpl electronicSpeedController =
       new ElectronicSpeedControllerImpl(12);
 
   public SpeedControlServiceImpl() {

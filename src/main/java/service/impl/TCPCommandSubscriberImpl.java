@@ -92,7 +92,6 @@ public class TCPCommandSubscriberImpl implements CommandSubscriber {
       while (true) {
         while (true) {
           try {
-            Thread.sleep(0L, 500);
             if (!receiving) {
               System.out.println("Stopping receiving commands");
               return;
@@ -100,17 +99,15 @@ public class TCPCommandSubscriberImpl implements CommandSubscriber {
 
             InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            if (bufferedReader.ready()) {
-              String message = bufferedReader.readLine();
-              System.out.println("MESSAGE IS : " + message);
-              if (!message.startsWith("h")) {
-                String[] messages = message.split(",");
-                String command = messages[0];
-                long timestamp = Long.parseLong(messages[1]);
-                long latency = System.currentTimeMillis() - timestamp;
-                System.out.println("Latency is: " + latency);
-                this.commandSenderService.sendCommand(command);
-              }
+            String message = bufferedReader.readLine();
+            System.out.println("MESSAGE IS : " + message);
+            if (!message.startsWith("h")) {
+              String[] messages = message.split(",");
+              String command = messages[0];
+              long timestamp = Long.parseLong(messages[1]);
+              long latency = System.currentTimeMillis() - timestamp;
+              System.out.println("Latency is: " + latency);
+              this.commandSenderService.sendCommand(command);
             }
           } catch (Exception var10) {
             var10.printStackTrace();
