@@ -1,36 +1,36 @@
 package service;
 
 public interface ElectronicSpeedController {
-    //Speed start from 1000 to 2000  µs (microsecond)
+  //Speed start from 1000 to 2000  µs (microsecond)
 
-    void calibrate();
+  void calibrate();
 
-    void arm(boolean isCalibrated);
+  void arm(boolean isCalibrated);
 
-    void disArm();
+  void disArm();
 
-    void fullSpeed();
+  void fullSpeed();
 
-    void minSpeed();
+  void minSpeed();
 
-    int calculateSpeed(int percentage);
+  int calculateSpeed(int percentage);
 
-    void changeSpeedTo(int percentage);
+  void changeSpeedTo(int percentage);
 
-    void updateSpeed(int speed);
+  void updateSpeed(int speed);
 
 
-    void increaseSpeed();
+  void increaseSpeed();
 
-    void decreaseSpeed();
+  void decreaseSpeed();
 
-    void increaseSpeedByMultiple();
+  void increaseSpeedByMultiple();
 
-    void decreaseSpeedByMultiple();
+  void decreaseSpeedByMultiple();
 
-    void setSpeedMultiple(int multiple);
+  void setSpeedMultiple(int multiple);
 
-    void testFlight();
+  void testFlight();
 
 
 }

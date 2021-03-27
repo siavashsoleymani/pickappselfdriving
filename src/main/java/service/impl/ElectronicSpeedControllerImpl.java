@@ -32,25 +32,19 @@ public class ElectronicSpeedControllerImpl implements ElectronicSpeedController 
 
 
   final float PWM_RANGE = 2000;
-  int operatingFrequency = Math.round(1000.0f / 16); // 62.5 Hz
-
-
   //For these calculation refer this link :
   // https://raspberrypi.stackexchange.com/questions/47300/answers-to-pwm-and-esc/76681#76681
   final float DISARM_ESC_SPEED = 0.f;
-  final float MIN_ESC_SPEED = PWM_RANGE * (6 / 100.f);  //6%
   final float MAX_ESC_SPEED = PWM_RANGE * (12 / 100.f); //8%
   final float ARM_ESC_SPEED = PWM_RANGE * (8 / 100.f);  //12%
-  final float SPEED_RANGE = MAX_ESC_SPEED - MIN_ESC_SPEED;
-
-  private int SPEED_CHANGE_MULTIPLE_OF = 10; //default value
-  private int SPEED_CHANGE_UNIT = 1; //default value
-
   final int TIME_INTERVAL = 1000; // 1 second
-
-  int currentESCSpeed = 0;
-
+  private final float MIN_ESC_SPEED = PWM_RANGE * (6 / 100.f);  //6%
+  final float SPEED_RANGE = MAX_ESC_SPEED - MIN_ESC_SPEED;
+  int operatingFrequency = Math.round(1000.0f / 16); // 62.5 Hz
   int bcmPinNumber = -1;
+  private int SPEED_CHANGE_MULTIPLE_OF = 5; //default value
+  private int SPEED_CHANGE_UNIT = 1; //default value
+  private int currentESCSpeed = 0;
 
   private ElectronicSpeedControllerImpl() {
   }
@@ -85,8 +79,10 @@ public class ElectronicSpeedControllerImpl implements ElectronicSpeedController 
   public void calibrate() {
 
     try {
+      System.out.println("Disconnect your power and press enter");
+      System.in.read();
       fullSpeed();
-      System.out.println("Connect your power");
+      System.out.println("Connect your power and press enter");
       System.in.read();
       minSpeed();
       Thread.sleep(TIME_INTERVAL);
@@ -94,6 +90,12 @@ public class ElectronicSpeedControllerImpl implements ElectronicSpeedController 
       disArm();
     }
     disArm();
+    try {
+      Thread.sleep(TIME_INTERVAL);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    minSpeed();
   }
 
   public void arm(boolean isCalibrated) {
@@ -206,5 +208,11 @@ public class ElectronicSpeedControllerImpl implements ElectronicSpeedController 
     SPEED_CHANGE_MULTIPLE_OF = multiple;
   }
 
+  public int getCurrentESCSpeed() {
+    return currentESCSpeed;
+  }
 
+  public float getMIN_ESC_SPEED() {
+    return MIN_ESC_SPEED;
+  }
 }

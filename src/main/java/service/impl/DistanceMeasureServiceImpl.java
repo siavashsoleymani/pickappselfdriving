@@ -20,7 +20,8 @@ public class DistanceMeasureServiceImpl implements DistanceMeasureService {
   public DistanceMeasureServiceImpl() {
     GpioController gpio = GpioFactory.getInstance();
     this.sensorTriggerPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_04);
-    this.sensorEchoPin = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, PinPullResistance.PULL_DOWN);
+    this.sensorEchoPin =
+        gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, PinPullResistance.PULL_DOWN);
   }
 
   public double measureDistance() throws InterruptedException {
@@ -28,15 +29,15 @@ public class DistanceMeasureServiceImpl implements DistanceMeasureService {
     Thread.sleep(0L);
     this.sensorTriggerPin.low();
 
-    while(this.sensorEchoPin.isLow()) {
+    while (this.sensorEchoPin.isLow()) {
     }
 
     long startTime = System.nanoTime();
 
-    while(this.sensorEchoPin.isHigh()) {
+    while (this.sensorEchoPin.isHigh()) {
     }
 
     long endTime = System.nanoTime();
-    return (double)(endTime - startTime) / 1000.0D / 2.0D / 29.1D;
+    return (double) (endTime - startTime) / 1000.0D / 2.0D / 29.1D;
   }
 }

@@ -6,7 +6,7 @@
 package service;
 
 public interface SpeedControlService {
-  int changeSpeed(String var1);
+  void changeSpeed(String var1);
 
   void emergencyBreak();
 }

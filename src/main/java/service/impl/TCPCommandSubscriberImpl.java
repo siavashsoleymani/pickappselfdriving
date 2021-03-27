@@ -11,54 +11,60 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import service.CommandSenderService;
 import service.CommandSubscriber;
 
 public class TCPCommandSubscriberImpl implements CommandSubscriber {
   private static Socket socket;
-  private final String host;
-  private final int port;
   private static volatile boolean receiving = false;
   private static CommandSubscriber COMMAND_SUBSCRIBER = null;
+  private final String host;
+  private final int port;
   private final CommandSenderService commandSenderService;
+  private final ExecutorService executorService;
 
-  private TCPCommandSubscriberImpl(String host, int port, CommandSenderService commandSenderService) {
+  private TCPCommandSubscriberImpl(String host, int port,
+                                   CommandSenderService commandSenderService,
+                                   ExecutorService executorService) {
     this.host = host;
     this.port = port;
     this.commandSenderService = commandSenderService;
+    this.executorService = executorService;
   }
 
-  public static CommandSubscriber getInstance(String host, int port, CommandSenderService commandSenderService) {
+  public static CommandSubscriber getInstance(String host, int port,
+                                              CommandSenderService commandSenderService,
+                                              ExecutorService executorService) {
     if (COMMAND_SUBSCRIBER == null) {
-      COMMAND_SUBSCRIBER = new TCPCommandSubscriberImpl(host, port, commandSenderService);
+      COMMAND_SUBSCRIBER = new TCPCommandSubscriberImpl(host, port, commandSenderService,
+          executorService);
     }
 
     return COMMAND_SUBSCRIBER;
   }
 
   public void connect() {
-    try {
-      socket = new Socket(this.host, this.port);
-      this.sendDeviceId();
-      this.startHeartBeat();
-      if (receiving) {
-        this.startReceivingCommands();
-      }
-    } catch (IOException var4) {
-      System.out.println("cant connect to server :" + var4.getMessage());
-
+    boolean connected = false;
+    while (!connected) {
       try {
-        Thread.sleep(2000L);
-      } catch (InterruptedException var3) {
-        var3.printStackTrace();
+        socket = new Socket(this.host, this.port);
+        this.sendDeviceId();
+        this.startHeartBeat();
+        connected = true;
+        if (receiving) {
+          this.startReceivingCommands();
+        }
+      } catch (IOException var4) {
+        connected = false;
+        System.out.println("cant connect to server :" + var4.getMessage());
+        try {
+          Thread.sleep(2000L);
+        } catch (InterruptedException var3) {
+          var3.printStackTrace();
+        }
       }
-
-      this.connect();
     }
-
   }
 
   private void sendDeviceId() throws IOException {
@@ -82,9 +88,9 @@ public class TCPCommandSubscriberImpl implements CommandSubscriber {
     }
 
     receiving = true;
-    CompletableFuture.runAsync(() -> {
-      while(true) {
-        while(true) {
+    executorService.submit(() -> {
+      while (true) {
+        while (true) {
           try {
             Thread.sleep(0L, 500);
             if (!receiving) {
@@ -119,9 +125,8 @@ public class TCPCommandSubscriberImpl implements CommandSubscriber {
   }
 
   private void startHeartBeat() {
-    ExecutorService executorService = Executors.newSingleThreadExecutor();
     executorService.submit(() -> {
-      while(true) {
+      while (true) {
         try {
           OutputStream outputStream = socket.getOutputStream();
           outputStream.write("h\n".getBytes());
@@ -130,6 +135,7 @@ public class TCPCommandSubscriberImpl implements CommandSubscriber {
         } catch (Exception var2) {
           var2.printStackTrace();
           this.connect();
+          break;
         }
       }
     });
